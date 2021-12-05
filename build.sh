@@ -28,10 +28,27 @@ printsection() {
     echo "----------"
 }
 
-confirm() {
-    echo "$1"
-    printf "Press enter to continue"
-    read
+getfirmware() {
+    echo "Ensuring firmware archive"
+    if [[ ! -f .firmwaredownloaded ]]; then
+        wget $(cat ${builddir}/firmware-url) -O firmware.tgz
+        tar -xvf firmware.tgz
+        rm firmware.tgz
+        touch .firmwaredownloaded
+    fi
+}
+
+installfirmware() {
+    getfirmware
+
+    printsection "Installing firmware to fs root"
+
+    pushd linux-firmware*/
+
+    make DESTDIR=${builddir}/filesystem/ install
+
+    popd
+
 }
 
 getlinux() {
@@ -60,14 +77,6 @@ makekernel() {
     if [ ! -f linux-${kernel_version}/arch/x86_64/boot/bzImage ]; then
         echo "Doing build."
         cd linux-${kernel_version}
-
-        if [[ -f ${builddir}/qemu-yes ]]; then
-            echo "Applying default config (VM/QEMU)"
-            make defconfig
-        else
-            echo "Using Archlinux config"
-            cp ../k-config .config
-        fi
 
         echo "Building"
         if [[ -f ${builddir}/qemu-yes ]]; then
@@ -220,6 +229,10 @@ image() {
     musl
     sg
 
+    if [[ ! -f firmware-no ]]; then
+        installfirmware
+    fi
+
     printsection "Making final image"
 
     if [ -d ikeda_mount ]; then
@@ -232,13 +245,8 @@ image() {
 
     echo "Making Ikeda Linux image"
 
-    if [[ -f ${builddir}/qemu-yes ]]; then
-	    fallocate -l1500M ikeda
-        rm ${builddir}/qemu-yes
-    else
-        # linux firmware is *chunky* also so is the kernel
-        fallocate -l6500M ikeda
-    fi
+    # linux firmware is *chunky* also so is the kernel
+    fallocate -l6500M ikeda
 	
     parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 
