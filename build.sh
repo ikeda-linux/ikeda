@@ -186,7 +186,7 @@ image() {
     buildbusybox
     buildbash
     musl
-    #sg
+    sg
 
     printsection "Making final image"
 
@@ -202,8 +202,6 @@ image() {
 	fallocate -l1500M ikeda
 	parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 
-    #fdisk -l ikeda
-    #read
 
 	sudo ./as_root.sh
 
