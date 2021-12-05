@@ -225,9 +225,22 @@ sg() {
 }
 
 rustysd() {
-    # look its 3am
+
+    if [[ ! -d rustysd ]]; then
+        git clone https://github.com/KillingSpark/rustysd ~/rustysd
+    else
+        pushd ~/rustysd && git pull && popd
+    fi
+
+    pushd ~/rustysd
+
+    cargo build --target=x86_64-unknown-linux-musl --release
+    
+    popd
+
     cp ~/rustysd/target/x86_64-unknown-linux-musl/release/rustysd filesystem/bin/.
     cp ~/rustysd/target/x86_64-unknown-linux-musl/release/rsdctl filesystem/bin/.
+
 }
 
 image() {
