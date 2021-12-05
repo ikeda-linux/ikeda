@@ -1,5 +1,11 @@
 #!/bin/bash
 
+set -e
+# keep track of the last executed command
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+# echo an error message before exiting
+trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+
 rootdir=$(pwd)
 
 if [[ ! -d build ]]; then
@@ -7,6 +13,7 @@ if [[ ! -d build ]]; then
 fi
 
 pushd build
+builddir=$(pwd)
 
 cores=$(nproc)
 
@@ -54,7 +61,7 @@ makekernel() {
         echo "Doing build."
         cd linux-${kernel_version}
 
-        if [[ "$1" == "qemu" ]]; then
+        if [[ -f ${builddir}/qemu-yes ]]; then
             echo "Applying default config (VM/QEMU)"
             make defconfig
         else
@@ -62,14 +69,25 @@ makekernel() {
             cp ../k-config .config
         fi
 
-        # this ensures anything that *would* be a module is built-in by def (vv)
-        sed "s/=m/=y/g" -i .config
-
         echo "Building"
-        make -j${cores}
+        if [[ -f ${builddir}/qemu-yes ]]; then
+            echo "Applying default config (VM/QEMU)"
+            make defconfig
+            # this ensures anything that *would* be a module is built-in by def (vv)
+            sed "s/=m/=y/g" -i .config
+            time make -j${cores}
+        else
+            echo "Using Archlinux config"
+            # this ensures anything that *would* be a module is built-in by def (vv)
+            sed "s/=m/=y/g" -i .config
+            cp ../k-config .config
+            time make all -j${cores}
+        fi
 
-        if [[ ! "$1" == "qemu" ]]; then
+        if [[ ! -f ${builddir}/qemu-yes ]]; then
+            sed "s/=m/=y/g" -i .config
             cp .config ../k-config
+            cp .config ../../src/k-config #TODO: add a flag for this in future?
         fi
 
         cd ../
@@ -214,8 +232,9 @@ image() {
 
     echo "Making Ikeda Linux image"
 
-    if [[ "$1" == "qemu" ]]; then
+    if [[ -f ${builddir}/qemu-yes ]]; then
 	    fallocate -l1500M ikeda
+        rm ${builddir}/qemu-yes
     else
         # linux firmware is *chunky* also so is the kernel
         fallocate -l6500M ikeda
@@ -229,6 +248,11 @@ image() {
 }
 
 test() {
+
+    if [[ "$1" == "qemu" ]]; then
+        touch qemu-yes
+    fi
+
     if [[ ! -f ikeda ]]; then
         image
     fi
@@ -240,6 +264,6 @@ test() {
     fi
 }
 
-test
+test "$@"
 
 popd
