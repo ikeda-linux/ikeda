@@ -226,8 +226,10 @@ sg() {
 
 rustysd() {
 
-    if [[ ! -d rustysd ]]; then
-        git clone https://github.com/KillingSpark/rustysd ~/rustysd
+    # I would love to not clone out of tree, but for some reason that's the only way it works
+    
+    if [[ ! -d ~/rustysd ]]; then
+        git clone git@git.tar.black:ikeda/rustysd.git ~/rustysd
     else
         pushd ~/rustysd && git pull && popd
     fi
