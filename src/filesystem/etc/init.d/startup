@@ -73,8 +73,8 @@ for dev in $(echo *); do
 done
 cd $OLD
 
-# TODO: REMOVE
-#exec udhcpc -f -S &
+killall udhcpc
+killall udhcpcd
 
 rustysd -c /etc/rustysd &
 

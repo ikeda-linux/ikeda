@@ -31,18 +31,22 @@ install -d -m 0750 root
 install -d -m 1777 tmp
 mkdir -p usr/{include,lib,share,src,local}
 
-ln -s bin/bash usr/bin/zsh
+#ln -s bin/bash usr/bin/zsh
 
 echo "Copying linux-${kernel_version} and busybox-${busybox_version}"
 cp ../linux-${kernel_version}/arch/x86_64/boot/bzImage boot/bzImage
+
 cp ../busybox-${busybox_version}/busybox usr/bin/busybox
 for util in $(./usr/bin/busybox --list-full); do
     ln -s /usr/bin/busybox $util
     echo "linked busybox to $util"
+
+    echo "$util" >> ${base}/things_linked.txt
+
 done
 
-mkdir -p usr/share/udhcpc
-cp -rv ../busybox-${busybox_version}/examples/udhcp/* usr/share/udhcpc/.
+#mkdir -p usr/share/udhcpc
+#cp -rv ../busybox-${busybox_version}/examples/udhcp/* usr/share/udhcpc/.
 
 echo "Installing musl-${musl_version} . . ."
 cp -r ../musl-out/* usr/.
@@ -75,9 +79,11 @@ printf "Would you like a RootFS tarball? (y/N): "
 read RFS
 
 if [[ "$RFS" == "y" ]]; then
-    rm ikeda.tar.gz
-    pushd ikeda_mount && tar -czf ../ikeda.tar.gz * && popd
+    if [[ -f ikeda.tar.gz ]]; then
+        rm ikeda.tar.gz
+    fi
+    pushd ikeda_mount && tar -cvzf ../ikeda.tar.gz * && popd
 fi
 
-umount -v ikeda_mount
+umount -vl ikeda_mount
 rm -rf ikeda_mount

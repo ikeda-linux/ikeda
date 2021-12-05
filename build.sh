@@ -220,6 +220,8 @@ sg() {
         popd
     fi
 
+    cp static-get filesystem/usr/bin/.
+
 }
 
 rustysd() {
