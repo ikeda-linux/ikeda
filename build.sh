@@ -264,6 +264,11 @@ ncurses() {
     make install
     popd
 
+
+    mkdir -p filesystem/usr/{lib,share}
+    cp -rv /usr/lib/terminfo filesystem/usr/lib/.
+    cp -rv /usr/share/terminfo filesystem/usr/share/.
+
 }
 
 image() {
