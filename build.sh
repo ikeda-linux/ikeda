@@ -258,17 +258,33 @@ ncurses() {
         rm ncurses-${ncurses_version}.tar.gz
     fi
     
-    pushd ncurses-${ncurses_version}
-    ./configure --prefix=${thisdir}/filesystem/usr --with-shared --without-debug
-    make
-    make install
-    popd
+    if [[ ! -f ncurses-${ncurses_version}/lib/libncurses.a ]]; then
+        pushd ncurses-${ncurses_version}
+        ./configure --prefix=${thisdir}/filesystem/usr --with-shared --without-debug
+        make
+        make install
+        popd
+    fi
 
 
     mkdir -p filesystem/usr/{lib,share}
     cp -rv /usr/lib/terminfo filesystem/usr/lib/.
     cp -rv /usr/share/terminfo filesystem/usr/share/.
 
+}
+
+notools() {
+    mkdir -p filesystem/usr/bin
+
+    # nofetch
+    wget https://git.tar.black/notools/nofetch/-/raw/master/nofetch
+    chmod +x nofetch
+    mv nofetch filesystem/usr/bin
+
+    #notop
+    wget https://git.tar.black/notools/notop/-/raw/master/notop
+    chmod +x notop
+    mv notop filesystem/usr/bin
 }
 
 image() {
@@ -279,6 +295,7 @@ image() {
     sg
     rustysd
     ncurses
+    notools
 
     if [[ ! -f firmware-no ]]; then
         installfirmware
