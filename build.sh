@@ -20,6 +20,9 @@ cores=$(nproc)
 kernel_version=$(cat linux-version)
 busybox_version=$(cat busybox-version)
 bash_version=$(cat bash-version)
+
+ncurses_version=$(cat ncurses-version)
+
 # check `musl.config.mak` for MUSL toolchain versions
 
 printsection() {
@@ -245,6 +248,24 @@ rustysd() {
 
 }
 
+ncurses() {
+
+    thisdir=$(pwd)
+
+    if [[ ! -d ncurses-${ncurses_version} ]]; then
+        wget https://invisible-mirror.net/archives/ncurses/ncurses-${ncurses_version}.tar.gz
+        tar -xvf ncurses-${ncurses_version}.tar.gz
+        rm ncurses-${ncurses_version}.tar.gz
+    fi
+    
+    pushd ncurses-${ncurses_version}
+    ./configure --prefix=${thisdir}/filesystem/usr --with-shared --without-debug
+    make
+    make install
+    popd
+
+}
+
 image() {
     makekernel
     buildbusybox
@@ -252,6 +273,7 @@ image() {
     musl
     sg
     rustysd
+    ncurses
 
     if [[ ! -f firmware-no ]]; then
         installfirmware
