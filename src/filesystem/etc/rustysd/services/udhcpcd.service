@@ -1,0 +1,10 @@
+[Unit]
+Description= Start udhcpcd to get an ip
+
+[Service]
+ExecStart=/bin/udhcpc -f -S
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=default.target

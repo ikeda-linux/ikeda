@@ -222,12 +222,20 @@ sg() {
 
 }
 
+rustysd() {
+    
+    # look its 3am
+    cp ~/rustysd/target/x86_64-unknown-linux-musl/release/rustysd filesystem/bin/.
+
+}
+
 image() {
     makekernel
     buildbusybox
     buildbash
     musl
     sg
+    rustysd
 
     if [[ ! -f firmware-no ]]; then
         installfirmware
