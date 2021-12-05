@@ -200,8 +200,10 @@ image() {
 
     echo "Making Ikeda Linux image"
 	fallocate -l1500M ikeda
-	parted ikeda mklabel dos --script
-    parted ikeda mkpart ext4 0 100% --script
+	parted ikeda mklabel msdos --script
+    parted --script ikeda 'mkpart primary ext4 1 -1' 
+    #fdisk -l ikeda
+    #read
 
 	sudo ./as_root.sh
 
