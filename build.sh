@@ -246,7 +246,7 @@ image() {
     echo "Making Ikeda Linux image"
 
     # linux firmware is *chunky* also so is the kernel
-    fallocate -l6500M ikeda
+    fallocate -l3000M ikeda
 	
     parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 

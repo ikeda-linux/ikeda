@@ -60,7 +60,7 @@ mount -o remount,rw /
 # Enable services (lel)
 #ln -s /etc/init.d/syslogd /etc/rc.d
 #ln -s /etc/init.d/klogd /etc/rc.d
-ln -s /etc/init.d/udhcpc /etc/rc.d
+#ln -s /etc/init.d/udhcpc /etc/rc.d/.
 
 echo "Raising network devices"
 OLD="$PWD"
@@ -72,6 +72,9 @@ for dev in $(echo *); do
   fi
 done
 cd $OLD
+
+# TODO: REMOVE
+exec udhcpc -f -S &
 
 # show the fun ascii-art
 cat /etc/prelogin
