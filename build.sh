@@ -223,10 +223,9 @@ sg() {
 }
 
 rustysd() {
-    
     # look its 3am
     cp ~/rustysd/target/x86_64-unknown-linux-musl/release/rustysd filesystem/bin/.
-
+    cp ~/rustysd/target/x86_64-unknown-linux-musl/release/rsdctl filesystem/bin/.
 }
 
 image() {

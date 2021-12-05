@@ -1,8 +1,9 @@
 [Unit]
-Description= Start udhcpcd to get an ip
+Description=Start klogd
+After=syslogd.service
 
 [Service]
-ExecStart=/sbin/udhcpc -f -S
+ExecStart=/sbin/klogd -n
 Type=simple
 Restart=always
 

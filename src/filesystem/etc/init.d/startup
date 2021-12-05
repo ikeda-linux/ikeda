@@ -76,7 +76,7 @@ cd $OLD
 # TODO: REMOVE
 #exec udhcpc -f -S &
 
-rustysd -c /etc/rustysd/config.toml &
+rustysd -c /etc/rustysd &
 
 # show the fun ascii-art
 cat /etc/prelogin

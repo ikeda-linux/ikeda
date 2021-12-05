@@ -1,3 +1,0 @@
-#!/bin/sh
-sv up /etc/init.d/syslogd || exit 1
-exec klogd -n
