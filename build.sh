@@ -313,8 +313,13 @@ image() {
 
     echo "Making Ikeda Linux image"
 
-    # linux firmware is *chunky* also so is the kernel
-    fallocate -l3000M ikeda
+    if [[ ! -f firmware-no ]]; then
+        # linux firmware is *chunky* also so is the kernel
+        fallocate -l3000M ikeda
+    else
+        # should fit w/o firmware and w/o arch kernel
+        fallocate -l1500M ikeda 
+    fi
 	
     parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 
