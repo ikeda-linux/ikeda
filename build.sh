@@ -52,12 +52,26 @@ makekernel() {
 
     if [ ! -f linux-${kernel_version}/arch/x86_64/boot/bzImage ]; then
         echo "Doing build."
-        echo "Applying default config"
         cd linux-${kernel_version}
-        make defconfig
-        sed "s/=m/=y/" -i .config
+
+        if [[ "$1" == "qemu" ]]; then
+            echo "Applying default config (VM/QEMU)"
+            make defconfig
+        else
+            echo "Using Archlinux config"
+            cp ../k-config .config
+        fi
+
+        # this ensures anything that *would* be a module is built-in by def (vv)
+        sed "s/=m/=y/g" -i .config
+
         echo "Building"
         make -j${cores}
+
+        if [[ ! "$1" == "qemu" ]]; then
+            cp .config ../k-config
+        fi
+
         cd ../
     else
         echo "Kernel exists. Not rebuilding."
@@ -199,8 +213,15 @@ image() {
     fi
 
     echo "Making Ikeda Linux image"
-	fallocate -l1500M ikeda
-	parted ikeda mklabel msdos --script
+
+    if [[ "$1" == "qemu" ]]; then
+	    fallocate -l1500M ikeda
+    else
+        # linux firmware is *chunky* also so is the kernel
+        fallocate -l6500M ikeda
+    fi
+	
+    parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 
 
 	sudo ./as_root.sh
@@ -219,11 +240,6 @@ test() {
     fi
 }
 
-# this is the main reason I want to re-write as a Makefile tbh
-if [[ "$1" == ""  || "$1" == "test" ]]; then
-    test "$2"
-elif [[ "$1" == "image" ]]; then
-    image
-fi
+test
 
 popd
