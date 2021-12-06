@@ -73,7 +73,7 @@ popd
 echo "Final filesystem setup"
 cp -r filesystem/* ikeda_mount/.
 chmod -R -x ikeda_mount/etc/*
-chmod -R +x ikeda_mount/etc/init.d/*
+chmod +x ikeda_mount/etc/startup
 
 printf "Would you like a RootFS tarball? (y/N): "
 read RFS

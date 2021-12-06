@@ -54,6 +54,7 @@ ip link set up dev lo
 
 # mounts all filesystems in /etc/fstab
 mount -a
+
 # make the root writable if this hasn't been done already
 mount -o remount,rw /
 

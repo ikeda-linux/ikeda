@@ -258,13 +258,12 @@ ncurses() {
         rm ncurses-${ncurses_version}.tar.gz
     fi
     
-    if [[ ! -f ncurses-${ncurses_version}/lib/libncurses.a ]]; then
-        pushd ncurses-${ncurses_version}
-        ./configure --prefix=${thisdir}/filesystem/usr --with-shared --without-debug
-        make
-        make install
-        popd
-    fi
+    pushd ncurses-${ncurses_version}
+    ./configure --prefix=${thisdir}/filesystem/usr --with-shared --without-debug
+    make
+    make install
+    popd
+
 
 
     mkdir -p filesystem/usr/{lib,share}
