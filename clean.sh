@@ -10,3 +10,4 @@ trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 rm -rf build/
 cp -r src build
 cp as_root.sh build/.
+cp chroot.sh build/.
