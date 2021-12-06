@@ -74,9 +74,13 @@ chmod -R -x ikeda_mount/etc/*
 chmod +x ikeda_mount/etc/startup
 
 # unknown if needed?
-partuuid=$(fdisk -l ../ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
+partuuid=$(fdisk -l ./ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
+
+echo "PARTUUID=${partuuid}"
+#read
+
 cp limine/limine.sys ikeda_mount/boot/. -v
-sed -i "s/something/${partuuid}/g" ikeda_mount/boot/limine.cfg
+sed -i "s/something/${partuuid}-01/g" ikeda_mount/boot/limine.cfg
 
 printf "Would you like a RootFS tarball? (y/N): "
 read RFS
