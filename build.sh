@@ -303,6 +303,10 @@ image() {
     printsection "Making final image"
 
     if [ -d ikeda_mount ]; then
+        findmnt | grep ikeda
+        if [[ "$?" == "0" ]]; then
+            sudo umount ikeda_mount
+        fi
         sudo rm ikeda_mount -rf
     fi
 
@@ -323,7 +327,27 @@ image() {
     parted ikeda mklabel msdos --script
     parted --script ikeda 'mkpart primary ext4 1 -1' 
 
+    if [[ ! -d limine ]]; then
+        git clone https://github.com/limine-bootloader/limine.git --branch=latest-binary --depth=1
+    else
+        pushd limine && git pull && popd
+    fi
+
 	sudo ./as_root.sh
+
+    pushd limine
+
+    ./limine-install-linux-x86_64 ../ikeda
+
+    popd
+
+    printf "CHROOT before unmounting? (Y/n)"
+    read CH
+
+    if [[ ! "$CH" == "n" ]]; then
+        echo "exit shell when done"
+        sudo ./chroot.sh
+    fi
 
 }
 
@@ -337,9 +361,7 @@ test() {
         image
     fi
 
-    if [[ "$1" == "-ng" ]]; then
-        qemu-system-x86_64 -enable-kvm -nographic ikeda
-    else
+    if [[ "$1" == "test" ]]; then
         qemu-system-x86_64 -enable-kvm ikeda
     fi
 }

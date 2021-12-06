@@ -1,10 +1,13 @@
 #!/bin/bash
 
 set -e
+
+# are these borked?
+
 # keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+#trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+#trap 'echo "\"${last_command}\" command failed with exit code $?."' EXIT
 
 
 cores=$(nproc)
@@ -59,15 +62,14 @@ pushd usr
 curl -LO https://github.com/romkatv/zsh-bin/releases/download/v6.0.0/zsh-5.8-linux-x86_64.tar.gz
 tar -xf zsh-5.8-linux-x86_64.tar.gz
 rm zsh-5.8-linux-x86_64.tar.gz
+# pop out of usr
 popd
 
-echo "Installing GRUB"
-grub-install --modules=part_msdos --target=i386-pc --boot-directory="$PWD/boot" ${tgt} 
+# unknown if needed?
 partuuid=$(fdisk -l ../ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
-mkdir -p boot/grub
-echo "linux /boot/bzImage quiet root=PARTUUID=${partuuid}-01" > boot/grub/grub.cfg 
-echo "boot" >> boot/grub/grub.cfg
+cp ../limine/limine.sys boot/. -v
 
+# pop out of mountpoint
 popd
 
 echo "Final filesystem setup"
@@ -85,5 +87,14 @@ if [[ "$RFS" == "y" ]]; then
     pushd ikeda_mount && tar -cvzf ../ikeda.tar.gz * && popd
 fi
 
-umount -vl ikeda_mount
-rm -rf ikeda_mount
+
+if [ -d ikeda_mount ]; then
+    findmnt | grep ikeda
+    if [[ "$?" == "0" ]]; then
+        umount ikeda_mount
+    fi
+    rm ikeda_mount -rf
+fi
+
+cd ${base}
+echo "we're in $(pwd)"
