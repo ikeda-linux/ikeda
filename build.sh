@@ -87,12 +87,14 @@ makekernel() {
             make defconfig
             # this ensures anything that *would* be a module is built-in by def (vv)
             sed "s/=m/=y/g" -i .config
+            echo "Building kernel."
             time make -j${cores}
         else
             echo "Using Archlinux config"
             # this ensures anything that *would* be a module is built-in by def (vv)
             sed "s/=m/=y/g" -i .config
             cp ../k-config .config
+            echo "Building kernel."
             time make all -j${cores}
         fi
 
@@ -248,6 +250,19 @@ rustysd() {
 
 }
 
+66() {
+    if [[ ! -d 66 ]]; then
+        git clone https://framagit.org/Obarun/66/
+    fi
+
+    pushd 66
+    ./build_toolchain.sh
+    ./configure --enable-static-libc --prefix=${thisdir}/filesystem
+    make
+    make install
+    popd 
+}
+
 ncurses() {
 
     thisdir=$(pwd)
@@ -292,7 +307,8 @@ image() {
     buildbash
     musl
     sg
-    rustysd
+    # rustysd
+    66
     ncurses
     notools
 
@@ -337,7 +353,7 @@ test() {
         image
     fi
 
-    if [[ "$1" == "-ng" ]]; then
+    if [[ "$2" == "-ng" ]]; then
         qemu-system-x86_64 -enable-kvm -nographic ikeda
     else
         qemu-system-x86_64 -enable-kvm ikeda
