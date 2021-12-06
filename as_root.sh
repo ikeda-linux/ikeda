@@ -65,10 +65,6 @@ rm zsh-5.8-linux-x86_64.tar.gz
 # pop out of usr
 popd
 
-# unknown if needed?
-partuuid=$(fdisk -l ../ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
-cp ../limine/limine.sys boot/. -v
-
 # pop out of mountpoint
 popd
 
@@ -76,6 +72,11 @@ echo "Final filesystem setup"
 cp -r filesystem/* ikeda_mount/.
 chmod -R -x ikeda_mount/etc/*
 chmod +x ikeda_mount/etc/startup
+
+# unknown if needed?
+partuuid=$(fdisk -l ../ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
+cp limine/limine.sys ikeda_mount/boot/. -v
+sed -i "s/something/${partuuid}/g" ikeda_mount/boot/limine.cfg
 
 printf "Would you like a RootFS tarball? (y/N): "
 read RFS
