@@ -65,7 +65,7 @@ echo "Installing GRUB"
 grub-install --modules=part_msdos --target=i386-pc --boot-directory="$PWD/boot" ${tgt} 
 partuuid=$(fdisk -l ../ikeda | grep "Disk identifier" | awk '{split($0,a,": "); print a[2]}' | sed 's/0x//g')
 mkdir -p boot/grub
-echo "linux /boot/bzImage quiet root=PARTUUID=${partuuid}-01" > boot/grub/grub.cfg 
+echo "linux /boot/bzImage quiet root=PARTUUID=${partuuid}-01 init=/bin/66-boot" > boot/grub/grub.cfg 
 echo "boot" >> boot/grub/grub.cfg
 
 popd
