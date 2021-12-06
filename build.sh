@@ -83,23 +83,45 @@ makekernel() {
 
         echo "Building"
         if [[ -f ${builddir}/qemu-yes ]]; then
-            echo "Applying default config (VM/QEMU)"
-            make defconfig
+            echo "Applying our simple config (VM/QEMU)"
+            cp ../simple-kconfig .config
+            make olddefconfig
             # this ensures anything that *would* be a module is built-in by def (vv)
             sed "s/=m/=y/g" -i .config
+
+            printf "Check w/ menuconfig? (Y/n)"
+            read mconf
+
+            if [[ ! "$mconf" == "n" ]]; then
+                make menuconfig
+            fi
+
             time make -j${cores}
         else
+            printsection "THIS IS USUALLY BROKEN"
             echo "Using Archlinux config"
             # this ensures anything that *would* be a module is built-in by def (vv)
+            cp ../arch-kconfig .config
             sed "s/=m/=y/g" -i .config
-            cp ../k-config .config
+
+            printf "Check w/ menuconfig? (Y/n)"
+            read mconf
+
+            if [[ ! "$mconf" == "n" ]]; then
+                make menuconfig
+            fi
+
             time make all -j${cores}
         fi
 
         if [[ ! -f ${builddir}/qemu-yes ]]; then
             sed "s/=m/=y/g" -i .config
-            cp .config ../k-config
-            cp .config ../../src/k-config #TODO: add a flag for this in future?
+            cp .config ../arch-kconfig
+            cp .config ../../src/arch-kconfig #TODO: add a flag for this in future?
+        else
+            sed "s/=m/=y/g" -i .config
+            cp .config ../simple-kconfig
+            cp .config ../../src/simple-kconfig #TODO: add a flag for this in future?
         fi
 
         cd ../
