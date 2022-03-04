@@ -1,6 +1,0 @@
-logging_dir = "/var/log/rustysd"
-log_to_stdout = false
-log_to_disk = true
-notifications_dir = "/var/notif/rustysd"
-unit_dirs = [ "/etc/rustysd/services" ]
-target_unit = "default.target"
