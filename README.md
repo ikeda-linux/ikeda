@@ -30,18 +30,6 @@ Ikeda is a WIP BusyBox and musl-libc based Linux System
 
 Note: some distros will also require you to install `foo-devel`, `foo-dev`, or `libfoo` variants of certain packages. 
 
-## General build:
-- `./build.sh`
-  - optionally append `qemu` to save time w/ stuff for hardware
-
-## Script notes:
-- Script will download and compile bits as needed
- - To force a re-compile of Linux, delete `work/linux-${kernel_version}/arch/x86_64/boot/bzImage`
- - To force a re-compile of BuxyBox, delete `work/busybox-${busybox_version}/busybox`
- - To force a re-compile of Bash, delete `work/bash-${bash_version}/out/bin/bash`
- - To force a re-compile of MUSL toolchain, delete `work/musl-out`
- - Alternatively, run `./clean.sh` to force rebuild and reclones of everything.
-
 ## Why the name?
 https://en.wikipedia.org/wiki/Ikeda_map
 
